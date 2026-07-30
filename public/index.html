@@ -815,7 +815,7 @@
 <header>
   <div class="logo">
     <div class="logo-disc"></div>
-    <span class="logo-name"><em>Project</em> Posterity</span>
+    <span class="logo-name"><em>CR</em>8 - your personal vinyl manager</span>
   </div>
   <nav>
     <button class="nav-btn active" data-tab="search" onclick="switchTab('search')">Search</button>
@@ -1040,7 +1040,7 @@
 
 </main>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 <script src="/js/DYMO.Label.Framework.latest.js" onerror="console.warn('DYMO SDK failed to load')"></script>
 <script>
 let collection = [];
@@ -1463,18 +1463,52 @@ function renderExport() {
   prev.innerHTML = `<div style="display:flex;flex-wrap:wrap;gap:16px;justify-content:center">${labels.join('')}</div>`;
 }
 
-function exportXLSX() {
+async function exportXLSX() {
   if (!collection.length) return alert('No tracks to export.');
-  const ws = XLSX.utils.json_to_sheet(collection.map(t => ({
-    'Artist': t.artist, 'Album': t.album, 'Track Title': t.title,
-    'Year': t.year, 'Genre': t.genre, 'Label': t.label,
-    'Position': t.position, 'Duration': t.duration,
-    'BPM': t.bpm, 'Key': t.key
+  if (!window.ExcelJS) return alert('Excel export library failed to load. Please refresh the page and try again.');
+
+  const workbook = new window.ExcelJS.Workbook();
+  workbook.creator = 'Vinyl Manager';
+  workbook.lastModifiedBy = 'Vinyl Manager';
+  workbook.created = new Date();
+  workbook.modified = new Date();
+
+  const worksheet = workbook.addWorksheet('Vinyl Collection');
+  worksheet.columns = [
+    { header: 'Artist', key: 'artist', width: 22 },
+    { header: 'Album', key: 'album', width: 26 },
+    { header: 'Track Title', key: 'title', width: 32 },
+    { header: 'Year', key: 'year', width: 7 },
+    { header: 'Genre', key: 'genre', width: 14 },
+    { header: 'Label', key: 'label', width: 22 },
+    { header: 'Position', key: 'position', width: 7 },
+    { header: 'Duration', key: 'duration', width: 10 },
+    { header: 'BPM', key: 'bpm', width: 7 },
+    { header: 'Key', key: 'key', width: 12 }
+  ];
+
+  worksheet.addRows(collection.map(t => ({
+    artist: t.artist,
+    album: t.album,
+    title: t.title,
+    year: t.year,
+    genre: t.genre,
+    label: t.label,
+    position: t.position,
+    duration: t.duration,
+    bpm: t.bpm,
+    key: t.key
   })));
-  ws['!cols'] = [22,26,32,7,14,22,7,10,7,12].map(wch => ({ wch }));
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Vinyl Collection');
-  XLSX.writeFile(wb, 'vinyl_collection.xlsx');
+
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = 'vinyl_collection.xlsx';
+  link.click();
+  URL.revokeObjectURL(link.href);
 }
 
 function exportDYMO() {
