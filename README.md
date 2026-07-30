@@ -1,4 +1,4 @@
-# Project Posterity
+# CR8
 
 A vinyl collection manager with Discogs integration, DYMO label printing, and BPM/key tracking via the Camelot wheel.
 
@@ -22,8 +22,8 @@ A vinyl collection manager with Discogs integration, DYMO label printing, and BP
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/holaefrain/Project-Posterity.git
-cd project-posterity
+git clone https://github.com/holaefrain/CR8.git
+cd CR8
 npm install
 ```
 
@@ -161,7 +161,7 @@ If neither source returns a result, enter BPM and key manually in the Collection
 
 ## File Structure
 ```
-project-posterity/
+CR8/
 ├── server.js               # Express API server
 ├── audioAnalysis.js        # BPM/key detection via yt-dlp + ffmpeg
 ├── public/

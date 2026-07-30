@@ -1,5 +1,5 @@
 {
-  "name": "vinyl-manager",
+  "name": "cr8",
   "version": "1.0.0",
   "description": "AI-powered vinyl collection manager with DYMO label export and Discogs integration",
   "main": "server.js",

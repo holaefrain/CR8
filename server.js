@@ -68,7 +68,7 @@ app.post('/api/search', async (req, res) => {
           const detailRes = await fetch(`https://api.discogs.com/releases/${release.id}`, {
             headers: {
               'Authorization': `Discogs token=${authToken}`,
-              'User-Agent': 'ProjectPosterity/1.0'
+              'User-Agent': 'CR8/1.0'
             }
           });
           const detail = await detailRes.json();
@@ -522,4 +522,4 @@ app.post('/api/discogs/export', async (req, res) => {
   res.json({ results });
 });
 
-app.listen(PORT, () => console.log(`\n Project Posterity running at http://localhost:${PORT}\n`));
+app.listen(PORT, () => console.log(`\n CR8 running at http://localhost:${PORT}\n`));
