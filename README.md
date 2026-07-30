@@ -1,6 +1,6 @@
-# CR8 - your personal vinyl manager
+# CR8
 
-A vinyl collection manager with Discogs integration, DYMO label printing, and BPM/key tracking via the Camelot wheel.
+CR8 is a personal vinyl collection manager with Discogs integration, DYMO label printing, and BPM/key tracking via the Camelot wheel.
 
 ---
 
@@ -22,8 +22,8 @@ A vinyl collection manager with Discogs integration, DYMO label printing, and BP
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/holaefrain/Project-Posterity.git
-cd project-posterity
+git clone https://github.com/holaefrain/CR8.git
+cd CR8
 npm install
 ```
 
@@ -91,6 +91,7 @@ sudo apt install ffmpeg
 - Search the Discogs database by artist, album, or track name
 - Returns up to 25 vinyl releases with full tracklists, artwork, genre, label, and year
 - Click a result to add the full album (all tracks) to your local collection
+- Once added, the app enriches tracks with BPM and key metadata in the background
 
 ### Collection
 - Sortable table of all tracks across every album you've added
@@ -120,7 +121,7 @@ Each sticker shows: artist, album, track position + title, and BPM · key · dur
 
 The DYMO Label Framework SDK is bundled at `public/js/DYMO.Label.Framework.latest.js` — no internet connection required for printing.
 
-> I broke this on accident, fixing soon. Just some weird bug with the printers I'm testing with.
+> If your printer is not detected, make sure DYMO Connect is running and the printer is connected before opening the Export tab.
 
 ### Discogs Tab
 - **Connect** with your Discogs username and token (or rely on `.env` values to auto-connect)
@@ -129,7 +130,7 @@ The DYMO Label Framework SDK is bundled at `public/js/DYMO.Label.Framework.lates
 - **Your Collection** (right column) — browse your Discogs collection, paginated; links back to each release on Discogs
 
 ### BPM / Key Detection
-BPM and key are fetched automatically when you click **Enrich BPM & Key** on a search result:
+BPM and key are fetched automatically after you add an album to your collection:
 
 1. **Beatport** is checked first (scraped from search results — works for most electronic releases)
 2. **YouTube audio analysis** is used as a fallback (requires `yt-dlp` + `ffmpeg`) — downloads the first 90 seconds of a linked video, runs tempo detection and a Krumhansl-Schmuckler key analysis
@@ -161,16 +162,17 @@ If neither source returns a result, enter BPM and key manually in the Collection
 
 ## File Structure
 ```
-project-posterity/
-├── server.js               # Express API server
+CR8/
+├── server.js               # Express API server and route wiring
 ├── audioAnalysis.js        # BPM/key detection via yt-dlp + ffmpeg
 ├── public/
-│   ├── index.html          # Full frontend (single-page app)
+│   ├── index.html          # Single-page app frontend
 │   └── js/
 │       └── DYMO.Label.Framework.latest.js  # DYMO SDK (bundled, no CDN needed)
-├── .gitignore              # Please put .env file so you don't commit
+├── .gitignore              # Ignores secrets and local artifacts
 ├── .env                    # Your secrets — never committed
 ├── package.json
+├── package-lock.json
 └── README.md
 ```
 
@@ -185,3 +187,8 @@ project-posterity/
 | GET  | `/api/discogs/collection` | Paginated Discogs collection for a user |
 | GET  | `/api/discogs/release/:id` | Full tracklist + videos for a single release |
 | POST | `/api/discogs/export` | Add albums to Discogs wantlist or collection |
+
+## Troubleshooting
+- If Discogs search fails, confirm your token is valid and that your `.env` values are loaded correctly.
+- If the DYMO printer is not detected, make sure DYMO Connect is running and the printer is connected before opening the Export tab.
+- If BPM/key enrichment returns no result, the app will still let you fill those values manually in the collection table.
