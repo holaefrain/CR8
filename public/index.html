@@ -5,43 +5,45 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Project Posterity</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0e0c0a;
-    --surface: #17140f;
-    --surface2: #211d17;
-    --surface3: #2c2820;
-    --amber: #c8922a;
-    --amber-dim: #8a611a;
-    --amber-glow: rgba(200,146,42,0.12);
-    --cream: #f0e6cc;
-    --cream-dim: #a89570;
-    --muted: #5c5040;
-    --border: rgba(200,146,42,0.18);
-    --border-subtle: rgba(255,255,255,0.06);
-    --red: #c04a2a;
-    --green: #4a9a6a;
+    /* Modern brutalist — cool porcelain + electric cobalt */
+    --bg: #eef0f4;
+    --surface: #ffffff;
+    --surface2: #f3f5f9;
+    --surface3: #e6e9f0;
+    --amber: #2f4bff;
+    --amber-dim: #1a30d6;
+    --amber-glow: #e2e7ff;
+    --cream: #0b0d12;
+    --cream-dim: #363a45;
+    --muted: #767c8c;
+    --border: #0b0d12;
+    --border-subtle: #0b0d12;
+    --red: #e5352b;
+    --green: #0f9d58;
     --mono: 'DM Mono', monospace;
-    --serif: 'Playfair Display', Georgia, serif;
+    --serif: 'Space Grotesk', sans-serif;
   }
 
-  @media (prefers-color-scheme: light) {
+  @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #f8f3ea;
-      --surface: #f0e8d8;
-      --surface2: #e8dece;
-      --surface3: #ddd3c0;
-      --amber: #a07018;
-      --amber-dim: #7a540f;
-      --amber-glow: rgba(160,112,24,0.1);
-      --cream: #1c1610;
-      --cream-dim: #4a3d28;
-      --muted: #8a7a62;
-      --border: rgba(160,112,24,0.22);
-      --border-subtle: rgba(0,0,0,0.08);
-      --red: #b83a1e;
-      --green: #2e7a4e;
+      /* Modern brutalist — ink + luminous cobalt */
+      --bg: #0b0d12;
+      --surface: #14171f;
+      --surface2: #1b1f29;
+      --surface3: #242936;
+      --amber: #5b78ff;
+      --amber-dim: #7d92ff;
+      --amber-glow: #141a33;
+      --cream: #f4f6fb;
+      --cream-dim: #c8cddb;
+      --muted: #7a8092;
+      --border: #f4f6fb;
+      --border-subtle: #f4f6fb;
+      --red: #ff5c4d;
+      --green: #3fd07a;
     }
   }
 
@@ -625,6 +627,186 @@
   .discogs-col .rc-tracks { font-size: 10px; }
   @media (max-width: 720px) {
     .discogs-columns { grid-template-columns: 1fr; }
+  }
+
+  /* ─────────────────────────────────────────────────────────
+     MODERN BRUTALIST OVERRIDES
+     Soft-square blocks, ink borders, hard offset shadows,
+     springy motion + entrance animations. Keeps all class hooks.
+  ───────────────────────────────────────────────────────── */
+  * { border-radius: 4px !important; }
+  hr.divider, .divider, thead th, tbody td, .tag, .pill, .nav-count { border-radius: 0 !important; }
+
+  :root { --ease-spring: cubic-bezier(.34,1.56,.64,1); }
+
+  body { font-weight: 400; letter-spacing: 0; }
+  body::before { opacity: 0.14; }
+
+  ::selection { background: var(--amber); color: #fff; }
+
+  /* Motion primitives */
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pop {
+    0% { opacity: 0; transform: scale(.92); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+  @keyframes sheen {
+    0% { background-position: -160% 0; }
+    100% { background-position: 260% 0; }
+  }
+
+  /* Header */
+  header {
+    border-bottom: 3px solid var(--border);
+    background: color-mix(in srgb, var(--surface) 82%, transparent);
+    backdrop-filter: blur(14px) saturate(1.4);
+    padding: 0 32px;
+  }
+  .logo { gap: 12px; }
+  .logo-disc {
+    background: var(--amber);
+    border: 3px solid var(--border);
+    animation: spin 6s linear infinite;
+  }
+  .logo-disc::after { inset: 10px; background: var(--surface); border: 2px solid var(--border); }
+  .logo-name { font-weight: 700; text-transform: uppercase; letter-spacing: -0.03em; }
+  .logo-name em { font-style: normal; color: var(--amber); }
+
+  /* Nav — animated underline */
+  .nav-btn {
+    border: 2px solid transparent;
+    font-weight: 600;
+    color: var(--cream-dim);
+    position: relative;
+    transition: color .2s ease, background .2s ease;
+  }
+  .nav-btn::after {
+    content: '';
+    position: absolute;
+    left: 12px; right: 12px; bottom: 4px;
+    height: 2px;
+    background: var(--amber);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform .3s var(--ease-spring);
+  }
+  .nav-btn:hover { color: var(--cream); background: var(--surface2); }
+  .nav-btn:hover::after { transform: scaleX(1); }
+  .nav-btn.active { color: #fff; background: var(--amber); border-color: var(--border); }
+  .nav-btn.active::after { display: none; }
+  .nav-count {
+    background: var(--cream);
+    color: var(--bg);
+    border: 2px solid var(--border);
+    font-weight: 600;
+    padding: 0 6px;
+    margin-left: 8px;
+  }
+
+  /* Headings */
+  .section-title {
+    font-family: var(--serif);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: -0.03em;
+    animation: rise .5s var(--ease-spring) both;
+  }
+  .section-sub { text-transform: uppercase; font-weight: 500; }
+  .discogs-col-header { font-family: var(--serif); font-weight: 700; text-transform: uppercase; letter-spacing: -0.02em; }
+  .export-card h3, .discogs-setup h3 { text-transform: uppercase; font-weight: 700; letter-spacing: 0.02em; }
+
+  /* Inputs */
+  input[type="text"], input[type="password"],
+  .filter-field input, .filter-field select,
+  .dymo-settings select, .dymo-settings input[type="number"],
+  .inline-num, .inline-key, .inline-pos, .inline-dur {
+    border: 2px solid var(--border);
+    background: var(--surface);
+    color: var(--cream);
+    font-weight: 400;
+    transition: box-shadow .2s var(--ease-spring), border-color .2s ease, transform .2s var(--ease-spring);
+  }
+  input[type="text"]:focus, input[type="password"]:focus,
+  .filter-field input:focus, .filter-field select:focus {
+    border-color: var(--amber);
+    box-shadow: 4px 4px 0 var(--amber);
+    transform: translateY(-1px);
+  }
+
+  /* Buttons — hard offset shadow, springy press */
+  .btn {
+    border: 2px solid var(--border);
+    background: var(--surface);
+    color: var(--cream);
+    font-weight: 700;
+    box-shadow: 3px 3px 0 var(--border);
+    transition: transform .15s var(--ease-spring), box-shadow .15s var(--ease-spring), background .2s;
+  }
+  .btn:hover { background: var(--amber-glow); box-shadow: 6px 6px 0 var(--border); transform: translate(-2px,-2px); }
+  .btn:active { box-shadow: 0 0 0 var(--border); transform: translate(3px,3px); }
+  .btn:disabled { box-shadow: 3px 3px 0 var(--border); transform: none; }
+  .btn.primary { background: var(--amber); color: #fff; border-color: var(--border); }
+  .btn.primary:hover { background: var(--amber-dim); color: #fff; }
+  .btn.danger { color: var(--red); }
+  .btn.success { color: var(--green); }
+
+  /* Cards / panels — bordered blocks with shadow */
+  .result-card, .export-card, .discogs-setup, .discogs-user-card,
+  .dymo-preview-wrap, .filter-panel, .token-notice, .table-container,
+  .result-row {
+    border: 2px solid var(--border);
+    box-shadow: 4px 4px 0 var(--border);
+    background: var(--surface);
+  }
+  .result-card {
+    transition: transform .18s var(--ease-spring), box-shadow .18s var(--ease-spring), background .2s;
+    animation: pop .4s var(--ease-spring) both;
+  }
+  .result-card:hover { background: var(--surface2); box-shadow: 7px 7px 0 var(--amber); transform: translate(-3px,-3px); }
+  .result-card.added { border-color: var(--green); box-shadow: 4px 4px 0 var(--green); opacity: 1; }
+
+  .rc-thumb, .rc-thumb-placeholder, .discogs-avatar { border: 2px solid var(--border); }
+  .rc-title { font-weight: 600; }
+
+  /* Tags & pills */
+  .tag {
+    border: 2px solid var(--border);
+    background: var(--surface2);
+    color: var(--cream);
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .tag.added { border-color: var(--green); color: var(--green); }
+  .tag.enriching {
+    border-color: var(--amber); color: var(--amber);
+    background: linear-gradient(90deg, var(--amber-glow) 25%, color-mix(in srgb, var(--amber) 22%, var(--amber-glow)) 50%, var(--amber-glow) 75%);
+    background-size: 200% 100%;
+    animation: sheen 1.4s linear infinite;
+  }
+  .pill { border: 2px solid var(--border); font-weight: 700; text-transform: uppercase; }
+
+  /* Table */
+  thead th {
+    background: var(--amber);
+    color: #fff;
+    font-weight: 700;
+    border-bottom: 2px solid var(--border);
+    border-right: 1px solid var(--border);
+  }
+  tbody td { border-bottom: 1px solid var(--border); transition: background .15s ease; }
+  tbody tr:hover td { background: var(--amber-glow); }
+  .del-btn { transition: color .15s ease, background .15s ease, transform .15s var(--ease-spring); }
+  .del-btn:hover { color: var(--red); background: var(--amber-glow); transform: scale(1.15); }
+
+  /* Misc */
+  hr.divider, .divider { border-top: 2px solid var(--border); }
+  .empty-state .big { opacity: 0.5; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
   }
 </style>
 </head>
