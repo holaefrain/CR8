@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-Project Posterity is an actively maintained personal project. Only the latest version on the `main` branch receives security updates.
+CR8 is an actively maintained personal project. Only the latest version on the `main` branch receives security updates.
 
 | Version | Supported |
 | ------- | --------- |
@@ -20,7 +20,7 @@ These are loaded from a `.env` file which is listed in `.gitignore`. Never hardc
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in Project Posterity, please open an issue on the [GitHub repository](https://github.com/holaefrain/Project-Posterity/issues) and label it **security**.
+If you discover a security vulnerability in CR8, please open an issue on the [GitHub repository](https://github.com/holaefrain/CR8/issues) and label it **security**.
 
 For sensitive disclosures (e.g., credential leaks), you can reach out directly through GitHub instead of opening a public issue.
 
