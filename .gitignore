@@ -7,3 +7,4 @@ node_modules/
 *.json
 *.txt
 *.db
+refactor.md

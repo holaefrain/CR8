@@ -1,4 +1,4 @@
-# Project Posterity
+# CR8 - your personal vinyl manager
 
 A vinyl collection manager with Discogs integration, DYMO label printing, and BPM/key tracking via the Camelot wheel.
 
