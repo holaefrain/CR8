@@ -24,7 +24,7 @@ The app never got past startup, so nothing built or ran.
 Ran `npm install`, which added the missing `music-tempo` package (1 package added, 88 audited). Re-ran the server and confirmed clean startup:
 
 ```
-Project Posterity running at http://localhost:3000
+CR8 running at http://localhost:3000
 ```
 
 **Follow-up / not yet addressed**

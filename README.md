@@ -9,11 +9,13 @@ CR8 is a personal vinyl collection manager with Discogs integration, DYMO label 
 | Requirement | Version | Notes |
 |-------------|---------|-------|
 | [Node.js](https://nodejs.org) | 18+ | Uses ESM modules and `--import` flag |
+| [Docker](https://www.docker.com/products/docker-desktop/) | any recent | Optional — runs FlareSolverr, needed for Beatport BPM/key lookups |
+| [FlareSolverr](https://github.com/FlareSolverr/FlareSolverr) | any recent | Optional — solves Beatport's Cloudflare challenge, runs as a Docker container |
 | [yt-dlp](https://github.com/yt-dlp/yt-dlp) | any recent | Optional — only needed for YouTube audio analysis fallback |
 | [FFmpeg](https://ffmpeg.org/download.html) | any recent | Optional — required alongside yt-dlp for audio analysis |
 | [DYMO Connect](https://www.dymo.com/support/dymo-connect-software-dymo-label-v-8-support.html) | desktop app | Optional — only needed for direct label printing |
 
-> **yt-dlp** and **ffmpeg** are only used as a fallback when Beatport doesn't have BPM/key data for a track. The app works fully without them — you can always enter BPM and key manually.
+> **FlareSolverr** is only needed to fetch Beatport's human-verified BPM/key data. **yt-dlp** and **ffmpeg** are only used as a further fallback when Beatport doesn't have data for a track. The app works fully without any of them — you can always enter BPM and key manually.
 
 ---
 
@@ -32,11 +34,12 @@ npm install
 ```
 DISCOGS_TOKEN=your_discogs_personal_access_token
 DISCOGS_USERNAME=your_discogs_username
+FLARESOLVERR_URL=http://localhost:8191/v1
 ```
 
 Get your token at [discogs.com/settings/developers](https://www.discogs.com/settings/developers) → **Generate new token**.
 
-> Both values are optional — if omitted, you can enter them directly in the app's Discogs tab UI.
+> All values are optional. Discogs credentials can be entered directly in the app's Discogs tab UI if omitted. `FLARESOLVERR_URL` defaults to `http://localhost:8191/v1` if omitted — only set it if FlareSolverr runs on a different host or port (see [Installing system dependencies](#installing-system-dependencies)).
 
 ### 3. Start the server
 
@@ -55,6 +58,32 @@ npm run dev
 ---
 
 ## Installing system dependencies
+
+### FlareSolverr (for Beatport)
+
+Beatport sits behind a Cloudflare managed challenge, so a plain HTTP request gets blocked with a 403. FlareSolverr drives a real headless browser to solve that challenge and hands the resulting HTML back to CR8.
+
+Run it as a Docker container:
+
+```bash
+docker run -d \
+  --name flaresolverr \
+  -p 8191:8191 \
+  -e LOG_LEVEL=info \
+  --restart unless-stopped \
+  ghcr.io/flaresolverr/flaresolverr:latest
+```
+
+`--restart unless-stopped` means the container comes back automatically whenever Docker Desktop starts — but Docker Desktop itself still needs to be running for Beatport lookups to work. If it's not running, `/api/enrich` silently falls through to the YouTube fallback (or no BPM/key at all).
+
+Verify it's up:
+
+```bash
+docker ps --filter name=flaresolverr
+curl http://localhost:8191/   # should return {"msg":"FlareSolverr is ready!", ...}
+```
+
+If you run FlareSolverr somewhere other than `localhost:8191` (a different host, port, or machine on your network), point CR8 at it by setting `FLARESOLVERR_URL` in `.env` — see [Create a `.env` file](#2-create-a-env-file). Keep the `/v1` suffix, e.g. `http://192.168.1.50:8191/v1`.
 
 ### yt-dlp
 
@@ -132,7 +161,7 @@ The DYMO Label Framework SDK is bundled at `public/js/DYMO.Label.Framework.lates
 ### BPM / Key Detection
 BPM and key are fetched automatically after you add an album to your collection:
 
-1. **Beatport** is checked first (scraped from search results — works for most electronic releases)
+1. **Beatport** is checked first (scraped from search results — works for most electronic releases). Requires **FlareSolverr** to be running, since Beatport blocks direct requests behind a Cloudflare challenge.
 2. **YouTube audio analysis** is used as a fallback (requires `yt-dlp` + `ffmpeg`) — downloads the first 90 seconds of a linked video, runs tempo detection and a Krumhansl-Schmuckler key analysis
 
 If neither source returns a result, enter BPM and key manually in the Collection table.
@@ -190,5 +219,6 @@ CR8/
 
 ## Troubleshooting
 - If Discogs search fails, confirm your token is valid and that your `.env` values are loaded correctly.
+- If Beatport lookups fail or the server logs `[Beatport] fetch error ... ECONNREFUSED`, make sure Docker Desktop and the `flaresolverr` container are running (`docker ps --filter name=flaresolverr`).
 - If the DYMO printer is not detected, make sure DYMO Connect is running and the printer is connected before opening the Export tab.
 - If BPM/key enrichment returns no result, the app will still let you fill those values manually in the collection table.

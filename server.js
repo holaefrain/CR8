@@ -68,7 +68,7 @@ app.post('/api/search', async (req, res) => {
           const detailRes = await fetch(`https://api.discogs.com/releases/${release.id}`, {
             headers: {
               'Authorization': `Discogs token=${authToken}`,
-              'User-Agent': 'ProjectPosterity/1.0'
+              'User-Agent': 'CR8/1.0'
             }
           });
           const detail = await detailRes.json();
@@ -169,12 +169,6 @@ function toCamelot(keyName) {
 }
 
 // ── Beatport scraper ──────────────────────────────────────
-const BEATPORT_HEADERS = {
-  'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-  'Accept-Language': 'en-US,en;q=0.9',
-  'DNT': '1'
-};
 
 // Recursively find the first array whose items have a numeric `bpm` field
 function findTrackArray(obj, depth = 0) {
@@ -204,15 +198,30 @@ function extractBeatportKey(track) {
   return String(k);
 }
 
+const FLARESOLVERR_URL = process.env.FLARESOLVERR_URL || 'http://localhost:8191/v1';
+
+// Beatport sits behind a Cloudflare managed challenge — a plain fetch() gets a
+// 403 "Just a moment..." page. FlareSolverr drives a real browser to solve the
+// challenge and hands back the resulting HTML + cookies.
+async function fetchViaFlareSolverr(url) {
+  const res = await fetch(FLARESOLVERR_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ cmd: 'request.get', url, maxTimeout: 60000 })
+  });
+  if (!res.ok) throw new Error(`FlareSolverr HTTP ${res.status}`);
+  const data = await res.json();
+  if (data.status !== 'ok') throw new Error(`FlareSolverr status: ${data.status} ${data.message || ''}`);
+  return data.solution.response;
+}
+
 async function enrichWithBeatport(artist, title) {
   const q = encodeURIComponent(`${artist} ${title}`);
   const url = `https://www.beatport.com/search/tracks?q=${q}`;
 
   let html;
   try {
-    const res = await fetch(url, { headers: BEATPORT_HEADERS });
-    if (!res.ok) { console.warn(`[Beatport] HTTP ${res.status} for "${title}"`); return null; }
-    html = await res.text();
+    html = await fetchViaFlareSolverr(url);
   } catch (e) {
     console.warn(`[Beatport] fetch error for "${title}":`, e.message);
     return null;
@@ -522,4 +531,4 @@ app.post('/api/discogs/export', async (req, res) => {
   res.json({ results });
 });
 
-app.listen(PORT, () => console.log(`\n Project Posterity running at http://localhost:${PORT}\n`));
+app.listen(PORT, () => console.log(`\n CR8 running at http://localhost:${PORT}\n`));
