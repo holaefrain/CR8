@@ -1,19 +1,108 @@
 {
-  "name": "CR8 - vinyl-manager",
-  "version": "1.0.0",
-  "description": "AI-powered vinyl collection manager with DYMO label export and Discogs integration",
-  "main": "server.js",
+  "name": "cr8",
+  "productName": "CR8",
+  "version": "1.0.0-beta.1",
+  "description": "Vinyl collection manager: Discogs search, BPM & Camelot key enrichment, and DYMO crate labels",
+  "author": "Efrain Cuessy",
+  "homepage": "https://github.com/holaefrain/CR8",
+  "main": "electron/main.js",
   "type": "module",
   "scripts": {
-    "start": "node --import dotenv/config server.js",
-    "dev": "node --watch --import dotenv/config server.js"
+    "dev": "node scripts/dev.mjs",
+    "start": "node scripts/dev.mjs",
+    "dev:server": "node --watch server/dev/standalone.js",
+    "test": "node --test \"test/*.test.js\"",
+    "build:site": "node scripts/build-site.js",
+    "dist": "electron-builder",
+    "dist:mac": "electron-builder --mac",
+    "dist:win": "electron-builder --win",
+    "preview:site": "npm run build:site && node scripts/preview-site.js"
   },
   "license": "ISC",
   "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^16.0.0",
+    "@fontsource/dm-mono": "^5.3.0",
+    "@fontsource/space-grotesk": "^5.3.0",
+    "animejs": "^4.5.0",
+    "electron-updater": "^6.8.9",
+    "exceljs": "^4.4.0",
     "express": "^4.18.0",
-    "music-tempo": "^1.0.3",
-    "node-fetch": "^3.3.0"
+    "ffmpeg-static": "^5.3.0",
+    "music-tempo": "^1.0.3"
+  },
+  "devDependencies": {
+    "@electron/fuses": "^2.1.3",
+    "electron": "^44.5.1",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "com.cr8.app",
+    "productName": "CR8",
+    "artifactName": "CR8-${os}-${arch}.${ext}",
+    "asar": true,
+    "asarUnpack": [
+      "node_modules/ffmpeg-static/**"
+    ],
+    "files": [
+      "electron/**",
+      "server/**",
+      "!server/dev/**",
+      "public/**",
+      "shared/**",
+      "package.json",
+      "node_modules/**",
+      "!node_modules/**/{test,tests,__tests__,example,examples,docs}/**",
+      "!**/*.map"
+    ],
+    "afterPack": "scripts/after-pack.cjs",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "mac": {
+      "category": "public.app-category.music",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ],
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "notarize": true
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "holaefrain",
+        "repo": "CR8",
+        "releaseType": "draft"
+      }
+    ]
   }
 }

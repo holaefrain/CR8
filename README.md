@@ -1,224 +1,128 @@
 # CR8
 
-CR8 is a personal vinyl collection manager with Discogs integration, DYMO label printing, and BPM/key tracking via the Camelot wheel.
+CR8 is a desktop vinyl manager for DJs and collectors: search Discogs, tag every track with BPM and Camelot key, and print DYMO labels for your crates. Everything stays on your computer.
+
+**Download:** [macOS (Apple Silicon)](https://github.com/holaefrain/CR8/releases/latest/download/CR8-mac-arm64.dmg) · [macOS (Intel)](https://github.com/holaefrain/CR8/releases/latest/download/CR8-mac-x64.dmg) · [Windows](https://github.com/holaefrain/CR8/releases/latest/download/CR8-win-x64.exe) · [All releases](https://github.com/holaefrain/CR8/releases)
 
 ---
 
-## Requirements
+## First run
 
-| Requirement | Version | Notes |
-|-------------|---------|-------|
-| [Node.js](https://nodejs.org) | 18+ | Uses ESM modules and `--import` flag |
-| [Docker](https://www.docker.com/products/docker-desktop/) | any recent | Optional — runs FlareSolverr, needed for Beatport BPM/key lookups |
-| [FlareSolverr](https://github.com/FlareSolverr/FlareSolverr) | any recent | Optional — solves Beatport's Cloudflare challenge, runs as a Docker container |
-| [yt-dlp](https://github.com/yt-dlp/yt-dlp) | any recent | Optional — only needed for YouTube audio analysis fallback |
-| [FFmpeg](https://ffmpeg.org/download.html) | any recent | Optional — required alongside yt-dlp for audio analysis |
-| [DYMO Connect](https://www.dymo.com/support/dymo-connect-software-dymo-label-v-8-support.html) | desktop app | Optional — only needed for direct label printing |
+1. **About you**: enter your first name (optional) and your Discogs username. CR8 checks the username exists as you type.
+2. **Connect your Discogs token**: the app walks you through it:
+   1. Sign in at [discogs.com](https://www.discogs.com).
+   2. Click your avatar (top right) → **Settings**.
+   3. Open the **Developers** tab ([discogs.com/settings/developers](https://www.discogs.com/settings/developers)).
+   4. Click **Generate new token** and copy it.
+   5. Paste it into CR8 and click **Verify & save**.
 
-> **FlareSolverr** is only needed to fetch Beatport's human-verified BPM/key data. **yt-dlp** and **ffmpeg** are only used as a further fallback when Beatport doesn't have data for a track. The app works fully without any of them — you can always enter BPM and key manually.
+   CR8 asks Discogs who the token belongs to, and only saves it if it matches your username. The token is encrypted with your operating system's keychain (macOS Keychain / Windows DPAPI) and is only ever sent to Discogs.
+3. You're in. To change the token later (for example after generating a new one on Discogs), go to **Discogs tab → Rotate token**.
 
----
-
-## Setup
-
-### 1. Clone and install
-
-```bash
-git clone https://github.com/holaefrain/CR8.git
-cd CR8
-npm install
-```
-
-### 2. Create a `.env` file
-
-```
-DISCOGS_TOKEN=your_discogs_personal_access_token
-DISCOGS_USERNAME=your_discogs_username
-FLARESOLVERR_URL=http://localhost:8191/v1
-```
-
-Get your token at [discogs.com/settings/developers](https://www.discogs.com/settings/developers) → **Generate new token**.
-
-> All values are optional. Discogs credentials can be entered directly in the app's Discogs tab UI if omitted. `FLARESOLVERR_URL` defaults to `http://localhost:8191/v1` if omitted — only set it if FlareSolverr runs on a different host or port (see [Installing system dependencies](#installing-system-dependencies)).
-
-### 3. Start the server
-
-```bash
-npm start
-```
-
-Open **http://localhost:3000** in your browser.
-
-For development with auto-restart on file changes:
-
-```bash
-npm run dev
-```
-
----
-
-## Installing system dependencies
-
-### FlareSolverr (for Beatport)
-
-Beatport sits behind a Cloudflare managed challenge, so a plain HTTP request gets blocked with a 403. FlareSolverr drives a real headless browser to solve that challenge and hands the resulting HTML back to CR8.
-
-Run it as a Docker container:
-
-```bash
-docker run -d \
-  --name flaresolverr \
-  -p 8191:8191 \
-  -e LOG_LEVEL=info \
-  --restart unless-stopped \
-  ghcr.io/flaresolverr/flaresolverr:latest
-```
-
-`--restart unless-stopped` means the container comes back automatically whenever Docker Desktop starts — but Docker Desktop itself still needs to be running for Beatport lookups to work. If it's not running, `/api/enrich` silently falls through to the YouTube fallback (or no BPM/key at all).
-
-Verify it's up:
-
-```bash
-docker ps --filter name=flaresolverr
-curl http://localhost:8191/   # should return {"msg":"FlareSolverr is ready!", ...}
-```
-
-If you run FlareSolverr somewhere other than `localhost:8191` (a different host, port, or machine on your network), point CR8 at it by setting `FLARESOLVERR_URL` in `.env` — see [Create a `.env` file](#2-create-a-env-file). Keep the `/v1` suffix, e.g. `http://192.168.1.50:8191/v1`.
-
-### yt-dlp
-
-```bash
-# macOS (Homebrew)
-brew install yt-dlp
-
-# Linux
-sudo curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp
-sudo chmod a+rx /usr/local/bin/yt-dlp
-
-# Windows — download yt-dlp.exe from https://github.com/yt-dlp/yt-dlp/releases
-# and place it somewhere on your PATH
-```
-
-### FFmpeg
-
-```bash
-# macOS (Homebrew)
-brew install ffmpeg
-
-# Ubuntu / Debian
-sudo apt install ffmpeg
-
-# Windows — download from https://ffmpeg.org/download.html
-# and add the bin/ folder to your PATH
-```
+> **macOS keychain prompt:** the first time CR8 saves your token, macOS may ask whether CR8 can use its "CR8 Safe Storage" keychain item. That item holds the key that encrypts your token, so choose **Always Allow**.
 
 ---
 
 ## Features
 
 ### Search
-- Search the Discogs database by artist, album, or track name
-- Returns up to 25 vinyl releases with full tracklists, artwork, genre, label, and year
-- Click a result to add the full album (all tracks) to your local collection
-- Once added, the app enriches tracks with BPM and key metadata in the background
+- Search the Discogs database by artist, album or track, with filters (artist, label, country, year, genre).
+- Click a result to add the whole album to your collection. BPM and key fill in track by track as they're found.
 
 ### Collection
-- Sortable table of all tracks across every album you've added
-- Columns: Artist, Album, Track, Year, Genre, Label, Position, Duration, BPM, Key
-- **BPM and Key** — enter manually using the Camelot wheel autocomplete (type `8A`, `8A — A minor`, or `A minor`)
-- Remove individual tracks with ×, or clear the entire collection
+- **Saved on your computer** and restored every time you open CR8.
+- Edit position, duration, BPM and key inline (the key field autocompletes Camelot codes: `8A`, `8A — A minor` or `A minor`).
+- **Export backup / Import backup** (.json) to move your collection between computers. When importing you can replace your current collection, or merge with it and skip duplicates.
+
+### BPM / key enrichment
+1. **Beatport** first. CR8 looks the track up in a hidden browser window, which gets past Beatport's bot check, so FlareSolverr and Docker are no longer needed.
+2. **YouTube audio analysis** as a fallback. CR8 downloads the first 90 s of a video linked on the Discogs release and runs tempo detection plus Krumhansl-Schmuckler key analysis. It uses a bundled ffmpeg and a [yt-dlp](https://github.com/yt-dlp/yt-dlp) helper that CR8 downloads on first use, checks against its SHA-256 checksum, and keeps updated.
+
+Turn either source on or off in **Discogs tab → Enrichment sources**. Both run on your computer, and you're responsible for using them in line with each site's terms.
 
 ### Export
+- **Print labels** straight to a DYMO LabelWriter (450, 450 Turbo, 550, 550 Turbo, 4XL, 5XL, Wireless) through [DYMO Connect](https://www.dymo.com/software.html), which must be running. On 550-series printers CR8 reads the installed roll. You can split labels to fit the roll, by a fixed number of tracks, or by vinyl side.
+- **Excel (.xlsx)** and **DYMO Connect CSV** exports.
 
-#### Excel (.xlsx)
-Full metadata for every track — opens directly in Excel or Numbers.
+### Discogs tab
+- Your profile, token status (`•••• last4`, last verified), **Rotate token** and **Remove**.
+- Browse your **wantlist** (click to add a release to your collection) and your **Discogs collection**.
+- **Export to Discogs**: push up to 100 albums from your local collection to your wantlist or collection.
 
-#### DYMO Labels (.csv)
-One row per track, formatted for import via **File → Import Data** in DYMO Connect.
-
-#### Print Labels (direct printing)
-Print vinyl stickers directly from the browser:
-
-1. Connect your LabelWriter via USB (or WiFi for the Wireless model)
-2. Open the **DYMO Connect** desktop app — it must be running in the background
-3. Go to the **Export** tab — the app auto-detects the printer
-4. Select your label roll size (LabelWriter 550 series auto-detects the installed roll)
-5. Click **Print labels** — one sticker per album, up to 5 tracks per sticker
-6. Multi-page albums get split stickers labeled `(1/2)`, `(2/2)`, etc.
-
-Each sticker shows: artist, album, track position + title, and BPM · key · duration.
-
-The DYMO Label Framework SDK is bundled at `public/js/DYMO.Label.Framework.latest.js` — no internet connection required for printing.
-
-> If your printer is not detected, make sure DYMO Connect is running and the printer is connected before opening the Export tab.
-
-### Discogs Tab
-- **Connect** with your Discogs username and token (or rely on `.env` values to auto-connect)
-- **Export to Discogs** — push your local collection to your Discogs Wantlist or Collection in one click
-- **Wantlist** (left column) — browse your Discogs wantlist, paginated; click any item to pull its full tracklist and add it to your local collection
-- **Your Collection** (right column) — browse your Discogs collection, paginated; links back to each release on Discogs
-
-### BPM / Key Detection
-BPM and key are fetched automatically after you add an album to your collection:
-
-1. **Beatport** is checked first (scraped from search results — works for most electronic releases). Requires **FlareSolverr** to be running, since Beatport blocks direct requests behind a Cloudflare challenge.
-2. **YouTube audio analysis** is used as a fallback (requires `yt-dlp` + `ffmpeg`) — downloads the first 90 seconds of a linked video, runs tempo detection and a Krumhansl-Schmuckler key analysis
-
-If neither source returns a result, enter BPM and key manually in the Collection table.
+### Rate limiting
+Discogs allows 60 requests per minute per token. CR8 paces its calls to stay under that. If the limit is hit anyway, CR8 shows a countdown and retries once.
 
 ---
 
-## DYMO Supported Models
-- LabelWriter 450
-- LabelWriter 450 Turbo
-- LabelWriter 550 *(auto-detects installed roll)*
-- LabelWriter 550 Turbo *(auto-detects installed roll)*
-- LabelWriter 4XL
-- LabelWriter Wireless
+## Development
 
-## Supported Label Sizes
-| Part # | Size | Dimensions |
-|--------|------|------------|
-| 30323  | 2⅛″ × 4″  | 54 × 101 mm |
-| 30252  | 1⅛″ × 3½″ | 28 × 89 mm  |
-| 30257  | 2⅛″ × 2⅛″ | 54 × 54 mm  |
-| 30336  | 1″ × 2⅛″  | 25 × 54 mm  |
-| 30332  | ¾″ × 2″   | 19 × 51 mm  |
-| 30370  | 2¼″ × 4″  | 57 × 101 mm |
-| Custom | —         | enter mm manually |
+Requirements: Node.js 22+ (Node 24 recommended).
 
----
+```bash
+git clone https://github.com/holaefrain/CR8.git
+cd CR8
+npm install
+npm run dev        # starts the desktop app
+npm test           # 38 tests: services, HTTP guard, collection store, enrichment, import boundaries
+```
 
-## File Structure
+`npm run dev:server` runs the local server **without Electron**, for debugging the API with curl:
+- It stores the profile and settings as plain JSON in `.cr8-dev/` (gitignored).
+- You can set `CR8_DEV_DISCOGS_TOKEN` in your shell to skip the keychain.
+- Every request needs the `X-CR8-Secret` header that it prints when it starts.
+
+`npm run dev` clears `ELECTRON_RUN_AS_NODE`, which some editors (VS Code) set for child processes. Without that, Electron starts as plain Node.
+
+### Architecture
+
+```
+main process (electron/)        OS + Electron APIs only: window, security policy, updater,
+                                keychain-backed token store, profile/settings files,
+                                hidden Beatport window
+      ▲  MessagePort RPC (allow-listed methods in server/ports.js)
+utility process (server/)       plain Node, never imports electron: Express on 127.0.0.1:<random>,
+                                Discogs client + throttle, enrichment, collection store,
+                                audio DSP in worker threads
+      ▲  HTTP + NDJSON, every request carries a per-launch secret injected by Electron
+renderer (public/)              sandboxed pages: onboarding.html, app.html (ES modules, no inline scripts)
+```
+
 ```
 CR8/
-├── server.js               # Express API server and route wiring
-├── audioAnalysis.js        # BPM/key detection via yt-dlp + ffmpeg
-├── public/
-│   ├── index.html          # Single-page app frontend
-│   └── js/
-│       └── DYMO.Label.Framework.latest.js  # DYMO SDK (bundled, no CDN needed)
-├── .gitignore              # Ignores secrets and local artifacts
-├── .env                    # Your secrets — never committed
-├── package.json
-├── package-lock.json
-└── README.md
+├── electron/           main process: main.js, security.js, rpcHost.js, preload.cjs, adapters/
+├── server/             app.js (wiring), ports.js, routes/, discogs/, account/, enrich/, collection/
+├── public/             app.html, onboarding.html, css/, js/ (api.js, app/*, components/*)
+├── shared/             errorCodes.js, styles/ (design tokens), motion/ (anime.js scope + hero)
+├── site/               the website (anime.js homepage, privacy page); `npm run build:site`
+├── test/               node:test suites + fixtures
+├── scripts/            dev launcher, website build, electron-builder afterPack (fuses)
+└── .github/workflows/  ci.yml, release.yml
 ```
 
-## API Endpoints
-| Method | Path | Description |
-|--------|------|-------------|
-| GET  | `/api/config` | Returns server-side config flags (no secrets exposed) |
-| POST | `/api/search` | Search Discogs by query string |
-| POST | `/api/enrich` | Fetch BPM/key via Beatport or YouTube audio analysis |
-| POST | `/api/discogs/verify` | Verify Discogs credentials, returns user profile |
-| GET  | `/api/discogs/wantlist` | Paginated wantlist for a user |
-| GET  | `/api/discogs/collection` | Paginated Discogs collection for a user |
-| GET  | `/api/discogs/release/:id` | Full tracklist + videos for a single release |
-| POST | `/api/discogs/export` | Add albums to Discogs wantlist or collection |
+### Website
+
+`npm run build:site` copies the shared tokens and motion modules, the pinned anime.js bundle and the fonts into `site/`, which is then deployed as-is (e.g. Cloudflare Pages: build command `npm run build:site`, output directory `site`). `site/_headers` sets the CSP and security headers.
+
+### Releasing
+
+Push a tag such as `v1.0.0`. `.github/workflows/release.yml` builds macOS arm64, macOS x64 and Windows x64, signs them, notarizes the macOS builds, and publishes a **draft** GitHub release. It then checks that the asset names match the website's download links. Repository secrets needed:
+
+| Secret | For |
+|---|---|
+| `MAC_CERT_P12_BASE64`, `MAC_CERT_PASSWORD` | Developer ID Application certificate |
+| `APPLE_API_KEY_P8`, `APPLE_API_KEY_ID`, `APPLE_API_ISSUER` | Notarization (App Store Connect API key) |
+| `AZURE_TENANT_ID`, `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET` | Windows signing via Azure Trusted Signing. Also add `win.azureSignOptions` (endpoint, account, certificate profile) to the `build` config in package.json. |
+
+Without signing secrets the builds still complete, but unsigned. macOS Gatekeeper and Windows SmartScreen will then warn users, and macOS auto-update won't work.
+
+To make a local unsigned build: `CSC_IDENTITY_AUTO_DISCOVERY=false npx electron-builder --mac dir -c.mac.notarize=false`.
+
+---
 
 ## Troubleshooting
-- If Discogs search fails, confirm your token is valid and that your `.env` values are loaded correctly.
-- If Beatport lookups fail or the server logs `[Beatport] fetch error ... ECONNREFUSED`, make sure Docker Desktop and the `flaresolverr` container are running (`docker ps --filter name=flaresolverr`).
-- If the DYMO printer is not detected, make sure DYMO Connect is running and the printer is connected before opening the Export tab.
-- If BPM/key enrichment returns no result, the app will still let you fill those values manually in the collection table.
+- **"Discogs rejected your token"**: you probably generated a new token on Discogs, which turns off the old one. Use **Discogs tab → Rotate token**.
+- **Printer not detected**: open DYMO Connect and make sure the LabelWriter is connected, then click **↺ Detect** in the Export tab.
+- **No BPM/key for a track**: Beatport had no match and there was no matching YouTube video on the Discogs release. Enter BPM and key by hand in the Collection table.
+- **"Restored your collection from backup"**: the collection file was damaged, and CR8 loaded the previous good copy. The damaged file is kept as `collection.corrupt-<time>.json` in CR8's data folder.
+
+Data provided by [Discogs](https://www.discogs.com). CR8 is not affiliated with Discogs, Beatport or DYMO.

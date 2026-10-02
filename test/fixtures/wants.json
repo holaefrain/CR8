@@ -1,0 +1,8 @@
+{
+  "pagination": { "page": 2, "pages": 35, "per_page": 2, "items": 69 },
+  "wants": [
+    { "id": 1, "basic_information": { "id": 111, "title": "Bushido E.P.", "year": 1999,
+      "artists": [{ "name": "Mike Dreben (3)" }], "genres": ["Electronic"], "styles": ["Techno"],
+      "labels": [{ "name": "Sonic Mind" }], "formats": [{ "name": "Vinyl" }], "thumb": "", "cover_image": "https://i.discogs.com/c.jpg" } }
+  ]
+}

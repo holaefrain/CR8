@@ -1,10 +1,22 @@
 node_modules/
 .env
+.env.*
+!.env.example
+*.log
 *.xlsx
 *.csv
-*.claude #yes, i used claude to test some code, don't kill me
-*.log
-*.json
-*.txt
 *.db
+*.txt
+*.claude #yes, i used claude to test some code, don't kill me
 refactor.md
+
+# Dev data (standalone server) — may contain a Discogs token
+.cr8-dev/
+
+# Build output
+dist/
+release/
+
+# Copied into the website by scripts/build-site.js
+site/vendor/
+site/shared/

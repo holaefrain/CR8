@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CR8 — your personal vinyl manager</title>
+<meta name="description" content="CR8 is a free desktop app for DJs and collectors: search Discogs, tag every track with BPM and Camelot key, and print DYMO labels for your crates.">
+<meta property="og:title" content="CR8 — your personal vinyl manager">
+<meta property="og:description" content="Search Discogs, tag tracks with BPM & Camelot key, print DYMO crate labels.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/vendor/fonts/dm-mono/300.css">
+<link rel="stylesheet" href="/vendor/fonts/dm-mono/400.css">
+<link rel="stylesheet" href="/vendor/fonts/dm-mono/500.css">
+<link rel="stylesheet" href="/vendor/fonts/space-grotesk/500.css">
+<link rel="stylesheet" href="/vendor/fonts/space-grotesk/700.css">
+<link rel="stylesheet" href="/shared/styles/tokens.css">
+<link rel="stylesheet" href="/shared/styles/hero.css">
+<link rel="stylesheet" href="/css/site.css">
+<script type="module" src="/js/home.js"></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav">
+  <a class="brand" href="/" aria-label="CR8 home"><span class="brand-disc" aria-hidden="true"></span><span><em>CR</em>8</span></a>
+  <nav aria-label="Main">
+    <a href="#features">Features</a>
+    <a href="#how">How it works</a>
+    <a href="#faq">FAQ</a>
+  </nav>
+  <a class="btn primary nav-cta" href="#download" data-download>Download</a>
+</header>
+
+<main id="main">
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow">Free desktop app · macOS &amp; Windows</p>
+      <h1 class="hero-title" data-split>Your vinyl, organized.</h1>
+      <p class="hero-sub" data-reveal>Search Discogs, tag every track with <strong>BPM</strong> and <strong>Camelot key</strong>, and print <strong>DYMO labels</strong> for your crates — all from one app that keeps your data on your computer.</p>
+      <div class="hero-ctas" data-reveal>
+        <a class="btn primary big" href="#download" data-download data-download-primary>Download CR8</a>
+        <a class="btn big" href="#how">How it works</a>
+      </div>
+      <p class="hero-alt" data-reveal data-download-alt></p>
+    </div>
+    <div class="hero-art">
+      <div id="hero-record" class="hero-record"></div>
+      <div class="now-playing" aria-label="Example readout: 124 BPM, key 8A">
+        <span class="np-label">Now playing</span>
+        <span class="np-value" id="np-value">124 BPM · 8A</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features" id="features" aria-labelledby="features-title">
+    <h2 class="section-title" id="features-title">Everything a crate needs</h2>
+    <div class="feature-grid">
+      <article class="feature" data-feature="search">
+        <svg class="feature-icon" viewBox="0 0 64 64" aria-hidden="true"><circle class="draw" cx="27" cy="27" r="16"/><path class="draw" d="M39 39 L54 54"/></svg>
+        <h3>Search Discogs</h3>
+        <p>Find any vinyl release by artist, label, country, year or genre — with full tracklists.</p>
+      </article>
+      <article class="feature" data-feature="bpm">
+        <div class="feature-icon bpm-counter" aria-hidden="true"><span id="bpm-count">124</span><small>BPM</small></div>
+        <h3>BPM &amp; Camelot key</h3>
+        <p>Every track is tagged from Beatport, with audio analysis as a fallback. Harmonic mixing, ready.</p>
+      </article>
+      <article class="feature" data-feature="dymo">
+        <div class="feature-icon label-slot" aria-hidden="true"><span class="slot"></span><span class="label-strip">A1 · 124 · 8A</span></div>
+        <h3>DYMO crate labels</h3>
+        <p>Print tracklists with BPM and key straight to a LabelWriter, split by side or by label size.</p>
+      </article>
+      <article class="feature" data-feature="sync">
+        <svg class="feature-icon" viewBox="0 0 64 64" aria-hidden="true">
+          <path id="sync-path" class="sync-ring" d="M32 10 A22 22 0 1 1 31.9 10"/>
+          <circle class="sync-dot" r="5"/><circle class="sync-dot alt" r="5"/>
+        </svg>
+        <h3>Discogs sync</h3>
+        <p>Browse your wantlist and collection, add records in a click, and push new finds back to Discogs.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- CAMELOT -->
+  <section class="camelot" aria-labelledby="camelot-title">
+    <div class="camelot-copy">
+      <h2 class="section-title" id="camelot-title">Mix in key</h2>
+      <p>CR8 writes keys in Camelot notation, so compatible tracks are easy to spot: stay on the same number, move one step around the wheel, or switch between A (minor) and B (major).</p>
+      <p class="hint">Hover a key to see what mixes with it.</p>
+    </div>
+    <div class="camelot-wheel" id="camelot-wheel" role="img" aria-label="Camelot wheel: 12 minor keys (A) on the inner ring and 12 major keys (B) on the outer ring"></div>
+  </section>
+
+  <!-- CRATE -->
+  <section class="crate-section" aria-labelledby="crate-title">
+    <h2 class="section-title" id="crate-title">Dig the crate</h2>
+    <p class="section-lead">Drag or flick through a sample crate — every record tagged and labelled.</p>
+    <div class="crate-viewport">
+      <div class="crate" id="crate" tabindex="0" aria-label="Sample crate — scroll horizontally"></div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how" id="how" aria-labelledby="how-title">
+    <h2 class="section-title" id="how-title">How it works</h2>
+    <div class="how-steps">
+      <svg class="how-line" viewBox="0 0 10 600" preserveAspectRatio="none" aria-hidden="true"><path d="M5 0 V600"/></svg>
+      <ol>
+        <li class="how-step"><span class="how-n">1</span><div><h3>Download CR8</h3><p>Install the app for macOS or Windows. It updates itself.</p></div></li>
+        <li class="how-step"><span class="how-n">2</span><div><h3>Connect your Discogs token</h3><p>About a minute, with a step-by-step guide. Your token is encrypted with your computer's keychain.</p></div></li>
+        <li class="how-step"><span class="how-n">3</span><div><h3>Start crating</h3><p>Search, add records, let CR8 fill in BPM and key, then print labels.</p></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq-section" id="faq" aria-labelledby="faq-title">
+    <h2 class="section-title" id="faq-title">Questions</h2>
+    <div class="faq" id="faq-list">
+      <details>
+        <summary>What is a Discogs token?</summary>
+        <p>A personal access token lets apps use the Discogs API as you — to search the database and read your wantlist and collection. You generate one in Discogs → Settings → Developers. CR8 walks you through it.</p>
+      </details>
+      <details>
+        <summary>Where is my token stored? Is it safe?</summary>
+        <p>On your computer only, encrypted with your operating system's keychain (macOS Keychain or Windows DPAPI). CR8 has no servers: the token is only ever sent to Discogs. You can rotate or remove it anytime in the app.</p>
+      </details>
+      <details>
+        <summary>Why does macOS ask about keychain access?</summary>
+        <p>The first time CR8 saves your token, macOS may ask to let CR8 use its own "CR8 Safe Storage" keychain item. That item holds the key that encrypts your token.</p>
+      </details>
+      <details>
+        <summary>Does it work with my LabelWriter?</summary>
+        <p>CR8 prints through DYMO Connect to LabelWriter 450, 550, 4XL, 5XL and Wireless models, and can read the loaded roll on 550-series printers. You can also export a CSV for DYMO Connect, or an Excel sheet.</p>
+      </details>
+      <details>
+        <summary>Is CR8 affiliated with Discogs?</summary>
+        <p>No. CR8 is an independent app that uses the Discogs API. Data provided by Discogs.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- DOWNLOAD -->
+  <section class="final" id="download" aria-labelledby="final-title">
+    <h2 class="final-title" id="final-title" data-wave>Start crating</h2>
+    <div class="download-buttons">
+      <a class="btn primary big" data-platform="mac-arm64" href="https://github.com/holaefrain/CR8/releases/latest/download/CR8-mac-arm64.dmg">macOS — Apple Silicon</a>
+      <a class="btn big" data-platform="mac-x64" href="https://github.com/holaefrain/CR8/releases/latest/download/CR8-mac-x64.dmg">macOS — Intel</a>
+      <a class="btn big" data-platform="win-x64" href="https://github.com/holaefrain/CR8/releases/latest/download/CR8-win-x64.exe">Windows</a>
+    </div>
+    <p class="fine">Free. <a href="https://github.com/holaefrain/CR8/releases">All releases &amp; notes</a></p>
+  </section>
+</main>
+
+<footer class="footer">
+  <p>Data provided by <a href="https://www.discogs.com">Discogs</a>. CR8 is not affiliated with Discogs, Beatport or DYMO.</p>
+  <p><a href="/privacy.html">Privacy</a> · <a href="https://github.com/holaefrain/CR8">GitHub</a> · <a href="https://github.com/holaefrain/CR8/blob/main/SECURITY.md">Security</a> · © CR8</p>
+</footer>
+</body>
+</html>

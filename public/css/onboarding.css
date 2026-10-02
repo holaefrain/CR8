@@ -1,0 +1,39 @@
+/* First-run onboarding */
+body.onboarding { display: grid; place-items: start center; min-height: 100vh; }
+.ob { width: min(680px, 100% - 32px); padding: 48px 0 64px; }
+
+.ob-progress { list-style: none; display: flex; gap: 6px; margin-bottom: 40px; }
+.ob-progress li {
+  flex: 1; padding-top: 10px; border-top: 3px solid var(--surface3);
+  font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
+  transition: border-color .3s ease, color .3s ease;
+}
+.ob-progress li.done { border-color: var(--cream); color: var(--cream-dim); }
+.ob-progress li.current { border-color: var(--amber); color: var(--amber); }
+
+.ob-steps { position: relative; }
+.ob-step[hidden] { display: none; }
+.ob-hero { width: 220px; margin: 0 0 28px -6px; }
+
+.ob-title {
+  font-family: var(--serif); font-weight: 700; font-size: clamp(26px, 5vw, 38px);
+  line-height: 1.1; letter-spacing: -0.02em; color: var(--cream); margin-bottom: 12px; outline: none;
+}
+.ob-title em { font-style: normal; color: var(--amber); }
+.ob-lead { font-size: 13px; line-height: 1.75; color: var(--cream-dim); margin-bottom: 28px; max-width: 54ch; }
+.ob-lead strong { color: var(--cream); font-weight: 500; }
+.ob-cta { margin-top: 20px; padding: 12px 26px; font-size: 13px; }
+.ob-back { margin-top: 24px; font-size: 11px; }
+
+.ob-form { display: grid; gap: 6px; max-width: 420px; }
+.ob-form input { width: 100%; font-family: var(--mono); }
+.ob-form .field-label { margin-top: 12px; }
+.optional { color: var(--muted); text-transform: none; letter-spacing: 0; }
+.ob-username { position: relative; }
+.ob-username-state {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  font-size: 14px; font-weight: 500;
+}
+.ob-username-state[data-state="ok"] { color: var(--green); }
+.ob-username-state[data-state="bad"] { color: var(--red); }
+.ob-username-state[data-state="busy"] { color: var(--muted); }

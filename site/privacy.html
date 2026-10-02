@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy — CR8</title>
+<meta name="description" content="CR8 keeps your data on your computer. What the app stores and where it sends data.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/vendor/fonts/dm-mono/300.css">
+<link rel="stylesheet" href="/vendor/fonts/dm-mono/500.css">
+<link rel="stylesheet" href="/vendor/fonts/space-grotesk/700.css">
+<link rel="stylesheet" href="/shared/styles/tokens.css">
+<link rel="stylesheet" href="/css/site.css">
+</head>
+<body>
+<header class="nav">
+  <a class="brand" href="/" aria-label="CR8 home"><span class="brand-disc" aria-hidden="true"></span><span><em>CR</em>8</span></a>
+</header>
+<main class="legal">
+  <h1 class="section-title">Privacy</h1>
+  <p><strong>Short version: CR8 has no servers and collects nothing.</strong> Everything the app knows about you stays on your computer.</p>
+
+  <h2>What the app stores on your computer</h2>
+  <ul>
+    <li>Your first name (optional) and Discogs username.</li>
+    <li>Your Discogs personal access token, encrypted with your operating system's keychain (macOS Keychain, Windows DPAPI).</li>
+    <li>Your collection: the tracks you add, with BPM, key and edits.</li>
+    <li>Your settings (which enrichment sources are on).</li>
+  </ul>
+  <p>These live in CR8's app-data folder. Uninstalling CR8 and deleting that folder removes them. In the app you can remove your token at any time (Discogs tab → Remove) and export or clear your collection.</p>
+
+  <h2>Where the app connects</h2>
+  <ul>
+    <li><strong>Discogs</strong> (api.discogs.com) — search, your profile, wantlist and collection, using your token.</li>
+    <li><strong>Beatport</strong> (beatport.com) — public search pages, to look up BPM and key. Can be turned off.</li>
+    <li><strong>YouTube</strong> — release videos listed on Discogs, downloaded briefly to analyse BPM and key, then discarded. Can be turned off.</li>
+    <li><strong>GitHub</strong> — to check for CR8 updates and to download the yt-dlp helper.</li>
+    <li><strong>DYMO Connect</strong> on your own computer (127.0.0.1) — to print labels.</li>
+  </ul>
+  <p>CR8 has no analytics, tracking or crash reporting.</p>
+
+  <h2>This website</h2>
+  <p>This site sets no cookies and runs no analytics. Your host may keep standard server logs.</p>
+
+  <p class="fine">Data provided by Discogs. CR8 is not affiliated with Discogs, Beatport or DYMO.</p>
+</main>
+<footer class="footer"><p><a href="/">Home</a> · <a href="https://github.com/holaefrain/CR8">GitHub</a></p></footer>
+</body>
+</html>

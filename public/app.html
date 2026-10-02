@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CR8</title>
+<link rel="stylesheet" href="/vendor/fonts/dm-mono/300.css">
+<link rel="stylesheet" href="/vendor/fonts/dm-mono/400.css">
+<link rel="stylesheet" href="/vendor/fonts/dm-mono/500.css">
+<link rel="stylesheet" href="/vendor/fonts/dm-mono/300-italic.css">
+<link rel="stylesheet" href="/vendor/fonts/space-grotesk/400.css">
+<link rel="stylesheet" href="/vendor/fonts/space-grotesk/500.css">
+<link rel="stylesheet" href="/vendor/fonts/space-grotesk/600.css">
+<link rel="stylesheet" href="/vendor/fonts/space-grotesk/700.css">
+<link rel="stylesheet" href="/shared/styles/tokens.css">
+<link rel="stylesheet" href="/css/app.css">
+<link rel="stylesheet" href="/css/components.css">
+<script type="module" src="/js/app/main.js"></script>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <div class="logo-disc"></div>
+    <span class="logo-name"><em>CR</em>8 - your personal vinyl manager</span>
+  </div>
+  <nav>
+    <button class="nav-btn active" data-tab="search">Search</button>
+    <button class="nav-btn" data-tab="collection">
+      Collection <span class="nav-count" id="nav-count">0</span>
+    </button>
+    <button class="nav-btn" data-tab="export">Export</button>
+    <button class="nav-btn" data-tab="discogs">Discogs</button>
+  </nav>
+  <div class="header-user" id="header-user"></div>
+</header>
+
+<div class="app-banner" id="app-banner" role="status" hidden></div>
+
+<main>
+
+  <!-- SEARCH TAB -->
+  <div class="section active" id="tab-search">
+    <h1 class="section-title">Search records</h1>
+    <p class="section-sub">POWERED BY DISCOGS & LOVE — SEARCH BY ARTIST, ALBUM, OR TRACK</p>
+
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="Search for records in the abyss..." />
+      <button class="btn primary" id="search-btn" data-action="search">Search</button>
+      <button class="btn" id="filter-toggle" data-action="toggle-filters" title="Filters">⚙ Filters</button>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="filter-panel" id="filter-panel">
+      <div class="filter-grid">
+        <div class="filter-field">
+          <label class="field-label">Artist</label>
+          <input type="text" id="f-artist" placeholder="Gaszia, Paranoid London, etc." />
+        </div>
+        <div class="filter-field">
+          <label class="field-label">Label</label>
+          <input type="text" id="f-label" placeholder="Zoobieville, ETA45MINS, etc." />
+        </div>
+        <div class="filter-field">
+          <label class="field-label">Country</label>
+          <input type="text" id="f-country" placeholder="US, UK, etc." />
+        </div>
+        <div class="filter-field">
+          <label class="field-label">Year</label>
+          <input type="text" id="f-year" placeholder="1994" />
+        </div>
+        <div class="filter-field">
+          <label class="field-label">Genre</label>
+          <input type="text" id="f-genre" placeholder="Electronic, Rock, Jazz, etc." />
+        </div>
+        <div class="filter-field">
+          <label class="field-label">Results</label>
+          <select id="f-per-page">
+            <option value="5">5</option>
+            <option value="10" selected>10</option>
+            <option value="15">15</option>
+            <option value="25">25</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn" style="margin-top:8px;font-size:10px" data-action="clear-filters">Clear filters</button>
+    </div>
+
+    <div class="status-line" id="search-status"></div>
+    <div class="results-grid" id="results-area"></div>
+  </div>
+
+  <!-- COLLECTION TAB -->
+  <div class="section" id="tab-collection">
+    <h1 class="section-title">My collection</h1>
+    <p class="section-sub">ALL TRACKS — SAVED ON THIS COMPUTER · CLICK × TO REMOVE</p>
+    <div id="collection-area">
+      <div class="empty-state"><span class="big">♪</span>No tracks yet. Search and add some records.</div>
+    </div>
+  </div>
+
+  <!-- EXPORT TAB -->
+  <div class="section" id="tab-export">
+    <h1 class="section-title">Export</h1>
+    <p class="section-sub">DOWNLOAD YOUR COLLECTION OR PRINT DYMO LABELS</p>
+
+    <div class="dymo-preview-wrap">
+      <div class="dymo-preview-label" id="preview-label-text">Label preview</div>
+
+      <!-- DYMO settings -->
+      <div class="dymo-settings">
+        <div class="field-row">
+          <span class="field-label">DYMO model</span>
+          <select id="dymo-model" data-label-setting>
+            <option>LabelWriter 450</option>
+            <option>LabelWriter 450 Turbo</option>
+            <option>LabelWriter 550</option>
+            <option>LabelWriter 550 Turbo</option>
+            <option>LabelWriter 4XL</option>
+            <option>LabelWriter 5XL</option>
+            <option>LabelWriter Wireless</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field-row">
+          <span class="field-label">Label roll</span>
+          <select id="dymo-size" data-label-setting>
+            <!-- Populated from DYMO_LABELS -->
+          </select>
+        </div>
+        <div class="field-row" id="custom-size-row" style="display:none">
+          <span class="field-label">Size (mm)</span>
+          <input type="number" id="custom-w" placeholder="W" min="10" max="200" style="width:54px" data-label-setting />
+          <span style="color:var(--muted);font-size:12px">×</span>
+          <input type="number" id="custom-h" placeholder="H" min="10" max="300" style="width:54px" data-label-setting />
+        </div>
+        <div class="field-row">
+          <span class="field-label">Split</span>
+          <select id="dymo-split" data-label-setting>
+            <option value="auto">Fit to label</option>
+            <option value="count">Tracks per label…</option>
+            <option value="side">By vinyl side</option>
+          </select>
+          <input type="number" id="dymo-split-count" min="1" max="30" value="4" style="width:54px;display:none" data-label-setting />
+        </div>
+        <div class="field-row" style="gap:8px">
+          <span class="field-label">Printer</span>
+          <span id="dymo-printer-status" style="font-size:11px;color:var(--muted)">Not detected</span>
+          <button class="btn" style="padding:4px 12px;font-size:11px" data-action="dymo-detect">↺ Detect</button>
+        </div>
+      </div>
+
+      <div id="label-preview"></div>
+      <div style="margin-top:16px;display:flex;gap:10px;align-items:center">
+        <button class="btn primary" id="btn-dymo-print" data-action="dymo-print" disabled>Print labels</button>
+        <span id="dymo-print-status" style="font-size:11px;color:var(--cream-dim)"></span>
+      </div>
+    </div>
+
+    <div class="export-grid">
+      <div class="export-card">
+        <h3>Excel spreadsheet</h3>
+        <p>Full metadata for every track — artist, album, title, year, genre, label, duration. Opens directly in Excel or Numbers.</p>
+        <button class="btn primary" data-action="export-xlsx">Download .xlsx</button>
+      </div>
+      <div class="export-card">
+        <h3>DYMO labels CSV</h3>
+        <p>One row per track, formatted for your selected label size. Import via <em>File → Import Data</em> in DYMO Connect.</p>
+        <button class="btn" data-action="export-csv">Download labels .csv</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DISCOGS TAB -->
+  <div class="section" id="tab-discogs">
+    <h1 class="section-title">Discogs</h1>
+    <p class="section-sub">YOUR ACCOUNT · WANTLIST · EXPORT YOUR COLLECTION</p>
+
+    <!-- Account: connected Discogs user + token management -->
+    <div class="discogs-user-card" id="dsc-user-card"></div>
+    <div class="connection-card" id="dsc-connection">
+      <div class="connection-row">
+        <div>
+          <div class="field-label">Personal access token</div>
+          <div class="connection-token" id="dsc-token-summary">—</div>
+        </div>
+        <div class="btn-row-inline">
+          <button class="btn" data-action="token-rotate">Rotate token</button>
+          <button class="btn danger" data-action="token-remove">Remove</button>
+        </div>
+      </div>
+      <div id="dsc-rotate" hidden></div>
+    </div>
+
+    <div class="connection-card">
+      <div class="field-label" style="margin-bottom:10px">Enrichment sources</div>
+      <label class="toggle-row"><input type="checkbox" id="setting-beatport"> Beatport — human-verified BPM &amp; key</label>
+      <label class="toggle-row"><input type="checkbox" id="setting-youtube"> YouTube audio analysis — fallback when Beatport has no match</label>
+      <p class="fine-print">These run on your computer. You're responsible for using them in line with each site's terms.</p>
+    </div>
+
+    <div id="dsc-connected">
+      <!-- Export to Discogs — top -->
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:8px">
+        <div>
+          <h2 style="font-family:var(--serif);font-size:22px;color:var(--cream);margin-bottom:6px">Export to Discogs</h2>
+          <p style="font-size:12px;color:var(--cream-dim);line-height:1.6">Push your local collection to your Discogs wantlist or collection.</p>
+        </div>
+      </div>
+      <div class="btn-row" style="margin-bottom:12px">
+        <button class="btn success" data-action="discogs-export" data-mode="wantlist">Add to Wantlist</button>
+        <button class="btn" data-action="discogs-export" data-mode="collection">Add to Collection</button>
+      </div>
+      <div class="status-line" id="discogs-status"></div>
+      <div class="result-list" id="discogs-results" style="margin-bottom:28px"></div>
+
+      <hr class="divider" style="margin-bottom:28px">
+
+      <!-- Two-column: wantlist left, collection right -->
+      <div class="discogs-columns">
+        <!-- LEFT: Wantlist -->
+        <div class="discogs-col">
+          <h2 class="discogs-col-header">Wantlist</h2>
+          <div class="status-line" id="wantlist-status"></div>
+          <div class="results-grid" id="wantlist-area"></div>
+          <div class="discogs-col-pagination" id="wantlist-pagination"></div>
+        </div>
+
+        <!-- RIGHT: Your Discogs Collection -->
+        <div class="discogs-col">
+          <h2 class="discogs-col-header">Your Collection</h2>
+          <div class="status-line" id="discogs-collection-status"></div>
+          <div class="results-grid" id="discogs-collection-area"></div>
+          <div class="discogs-col-pagination" id="discogs-collection-pagination"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+<footer class="app-footer">Data provided by <a href="https://www.discogs.com" target="_blank" rel="noopener">Discogs</a>. CR8 is not affiliated with Discogs.</footer>
+</body>
+</html>

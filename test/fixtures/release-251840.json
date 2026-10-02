@@ -1,0 +1,18 @@
+{
+  "id": 251840,
+  "title": "Black Mahogani",
+  "year": 2004,
+  "artists": [{ "name": "Moodymann", "id": 2160 }],
+  "genres": ["Electronic"],
+  "styles": ["Deep House", "Soul"],
+  "labels": [{ "name": "Peacefrog Records" }],
+  "tracklist": [
+    { "position": "", "type_": "heading", "title": "Side A" },
+    { "position": "A1", "type_": "track", "title": "Holiday", "duration": "6:12" },
+    { "position": "A2", "type_": "track", "title": "Roberta Jean Machine", "duration": "" , "artists": [{ "name": "Moodymann (2)" }, { "name": "Andrés" }] }
+  ],
+  "videos": [
+    { "uri": "https://www.youtube.com/watch?v=dQw4w9WgXcQ", "title": "Moodymann - Holiday" },
+    { "uri": "https://youtu.be/aaaaaaaaaaa", "title": "Moodymann – Roberta Jean Machine" }
+  ]
+}

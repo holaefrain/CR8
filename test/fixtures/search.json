@@ -1,0 +1,7 @@
+{
+  "pagination": { "page": 1, "pages": 1, "per_page": 2, "items": 2 },
+  "results": [
+    { "id": 251840, "title": "Moodymann - Black Mahogani", "year": "2004", "genre": ["Electronic"], "style": ["Deep House"], "thumb": "https://i.discogs.com/thumb1.jpg" },
+    { "id": 999, "title": "Someone - Something - Else", "year": "1999", "genre": ["Jazz"], "thumb": "" }
+  ]
+}

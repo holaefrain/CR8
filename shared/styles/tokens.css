@@ -1,0 +1,45 @@
+/* CR8 design tokens — shared by the app, onboarding and the website.
+   Modern brutalist: cool porcelain + electric cobalt (light), ink + luminous cobalt (dark). */
+:root {
+  /* Modern brutalist — cool porcelain + electric cobalt */
+  --bg: #eef0f4;
+  --surface: #ffffff;
+  --surface2: #f3f5f9;
+  --surface3: #e6e9f0;
+  --amber: #2f4bff;
+  --amber-dim: #1a30d6;
+  --amber-glow: #e2e7ff;
+  --cream: #0b0d12;
+  --cream-dim: #363a45;
+  --muted: #767c8c;
+  --border: #0b0d12;
+  --border-subtle: #0b0d12;
+  --red: #e5352b;
+  --green: #0f9d58;
+  --mono: 'DM Mono', ui-monospace, monospace;
+  --serif: 'Space Grotesk', system-ui, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Modern brutalist — ink + luminous cobalt */
+    --bg: #0b0d12;
+    --surface: #14171f;
+    --surface2: #1b1f29;
+    --surface3: #242936;
+    --amber: #5b78ff;
+    --amber-dim: #7d92ff;
+    --amber-glow: #141a33;
+    --cream: #f4f6fb;
+    --cream-dim: #c8cddb;
+    --muted: #7a8092;
+    --border: #f4f6fb;
+    --border-subtle: #f4f6fb;
+    --red: #ff5c4d;
+    --green: #3fd07a;
+  }
+}
+
+:root {
+  --ease-spring: cubic-bezier(.34,1.56,.64,1);
+}

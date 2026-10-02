@@ -1,11 +1,7 @@
-import { spawn } from 'child_process';
 import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
 const MusicTempo = require('music-tempo');
-
-const SAMPLE_RATE = 22050;
-const DOWNLOAD_SECONDS = 90;
 
 // ── FFT (Cooley-Tukey radix-2) ─────────────────────────────────────────────
 function fft(real, imag) {
@@ -82,7 +78,7 @@ function computeChromagram(samples, sampleRate) {
 }
 
 // ── Key detection (Krumhansl-Schmuckler) ───────────────────────────────────
-function detectKey(samples, sampleRate) {
+export function detectKey(samples, sampleRate) {
   // Krumhansl-Kessler tonal hierarchy profiles
   const majorProfile = [6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88];
   const minorProfile = [6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17];
@@ -120,118 +116,8 @@ function detectKey(samples, sampleRate) {
   return bestKey;
 }
 
-// ── Video-to-track title matching ──────────────────────────────────────────
-function normalize(str) {
-  return str
-    .toLowerCase()
-    .replace(/feat\.?.*$/i, '')        // strip "feat. X"
-    .replace(/\(.*?\)/g, '')           // strip parentheses
-    .replace(/\[.*?\]/g, '')           // strip brackets
-    .replace(/^[a-z]\d*[\.\s:–\-]+/i, '') // strip side/position prefix: A1. B2: etc.
-    .replace(/^side\s+[ab]\s*[-:.]?\s*/i, '') // strip "Side A/B"
-    .replace(/[^a-z0-9\s]/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-export function matchVideoToTrack(trackTitle, videos) {
-  if (!videos?.length) return null;
-  const trackNorm = normalize(trackTitle);
-  if (!trackNorm) return null;
-
-  let bestUrl = null;
-  let bestScore = 0;
-
-  for (const video of videos) {
-    if (!video?.uri || !video?.title) continue;
-
-    // Strip "Artist - " prefix common in video titles
-    const stripped = video.title.replace(/^[^–\-]+(–|-)\s*/, '');
-    const videoNorm = normalize(stripped);
-    if (!videoNorm) continue;
-
-    // Exact match — return immediately
-    if (videoNorm === trackNorm) return video.uri;
-
-    // Substring containment — score by length ratio to penalise over-broad matches
-    if (videoNorm.includes(trackNorm) || trackNorm.includes(videoNorm)) {
-      const score = Math.min(videoNorm.length, trackNorm.length) /
-                    Math.max(videoNorm.length, trackNorm.length);
-      if (score > bestScore) { bestScore = score; bestUrl = video.uri; }
-      continue;
-    }
-
-    // Word-overlap fallback (threshold ≥ 0.6)
-    const tw = new Set(trackNorm.split(' ').filter(w => w.length > 2));
-    const vw = new Set(videoNorm.split(' ').filter(w => w.length > 2));
-    if (tw.size === 0) continue;
-    let overlap = 0;
-    for (const w of tw) if (vw.has(w)) overlap++;
-    const score = overlap / Math.max(tw.size, vw.size);
-    if (score >= 0.6 && score > bestScore) { bestScore = score; bestUrl = video.uri; }
-  }
-
-  return bestUrl;
-}
-
-// ── Audio download via yt-dlp | ffmpeg ────────────────────────────────────
-function downloadAudioPCM(url) {
-  return new Promise((resolve, reject) => {
-    const ytdlp = spawn('yt-dlp', [
-      '-x', '-f', 'bestaudio',
-      '--download-sections', `*0-${DOWNLOAD_SECONDS}`,
-      '--no-playlist',
-      '-o', '-',
-      '--quiet',
-      url
-    ], { stdio: ['ignore', 'pipe', 'pipe'] });
-
-    const ffmpeg = spawn('ffmpeg', [
-      '-i', 'pipe:0',
-      '-f', 's16le',
-      '-ac', '1',
-      '-ar', String(SAMPLE_RATE),
-      '-loglevel', 'error',
-      'pipe:1'
-    ], { stdio: ['pipe', 'pipe', 'pipe'] });
-
-    ytdlp.stdout.pipe(ffmpeg.stdin);
-    ytdlp.stderr.on('data', () => {});  // suppress yt-dlp output
-
-    const chunks = [];
-    ffmpeg.stdout.on('data', chunk => chunks.push(chunk));
-
-    const timeout = setTimeout(() => {
-      ytdlp.kill('SIGKILL');
-      ffmpeg.kill('SIGKILL');
-      reject(new Error('Audio download timed out'));
-    }, 90_000);
-
-    ffmpeg.stdout.on('end', () => {
-      clearTimeout(timeout);
-      const buf = Buffer.concat(chunks);
-      if (buf.length < 2) return reject(new Error('Empty audio buffer'));
-
-      // Convert S16LE → Float32
-      const samples = new Float32Array(buf.length / 2);
-      for (let i = 0; i < samples.length; i++) {
-        samples[i] = buf.readInt16LE(i * 2) / 32768.0;
-      }
-      resolve(samples);
-    });
-
-    ffmpeg.on('error', err => { clearTimeout(timeout); reject(err); });
-    ytdlp.on('error', err => { clearTimeout(timeout); reject(err); });
-  });
-}
-
-// ── Public: analyze a YouTube URL → { bpm, key } ──────────────────────────
-export async function analyzeAudio(url) {
-  const samples = await downloadAudioPCM(url);
-
+// ── Public: PCM samples → { bpm, key } ────────────────────────────────────
+export function analyzeSamples(samples, sampleRate) {
   const mt = new MusicTempo(samples);
-  const bpm = Math.round(mt.tempo);
-  const key = detectKey(samples, SAMPLE_RATE);
-
-  return { bpm, key };
+  return { bpm: Math.round(mt.tempo), key: detectKey(samples, sampleRate) };
 }
